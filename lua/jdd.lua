@@ -1,5 +1,10 @@
 local M = {}
 local Job = require("plenary.job")
+local log = require("plenary.log").new({
+  plugin = "jdd",
+  level = "info",
+  use_console = false,
+})
 
 --- Default configuration for jdd.nvim
 -- @field root? string Directory to watch
@@ -64,13 +69,13 @@ function M.start()
     command = "jdd",
     args = args,
     on_stdout = function(_, data)
-      vim.schedule(function() vim.notify("[jdd] " .. data, vim.log.levels.INFO) end)
+      vim.schedule(function() log.info(data) end)
     end,
     on_stderr = function(_, data)
-      vim.schedule(function() vim.notify("[jdd] ERROR: " .. data, vim.log.levels.ERROR) end)
+      vim.schedule(function() log.error(data) end)
     end,
     on_exit = function(_, code)
-      vim.schedule(function() vim.notify("[jdd] exited with code " .. code, vim.log.levels.INFO) end)
+      vim.schedule(function() log.info("jdd exited with code " .. code) end)
     end,
   })
 
