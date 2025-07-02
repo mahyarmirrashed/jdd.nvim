@@ -117,4 +117,10 @@ vim.api.nvim_create_user_command(
   { desc = "Stop the Johnny Decimal Daemon (jdd) if it is currently running." }
 )
 
+vim.api.nvim_create_user_command(
+  "JddStatus",
+  function() vim.notify("jdd running: " .. tostring(jdd_job ~= nil)) end,
+  { desc = "Indicates if the Johnny Decimal Daemon (jdd) is currently running." }
+)
+
 return M
