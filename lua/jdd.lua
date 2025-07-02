@@ -95,4 +95,13 @@ vim.api.nvim_create_autocmd("VimLeavePre", {
   callback = function() M.stop() end,
 })
 
+--- Create auto commands for starting and stopping the Johnny Decimal Daemon.
+vim.api.nvim_create_user_command("JddStart", function()
+  if not jdd_job then M.start() end
+end, {})
+
+vim.api.nvim_create_user_command("JddStop", function()
+  if jdd_job then M.stop() end
+end, {})
+
 return M
