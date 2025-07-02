@@ -58,10 +58,10 @@ Configure and start JDD with the `setup()` function. All options map directly to
 
 ```lua
 require("jdd").setup({
-  root = "~/Documents",
-  log_level = "info",
-  dry_run = true,
-  exclude = { ".git/**", "tmp/**" },
+  -- root = "~/Documents",
+  -- log_level = "info",
+  dry_run = false,
+  -- exclude = { ".git/**", "tmp/**" },
   -- config = "/path/to/.jd.yaml", -- optional
   start = true,
 })
