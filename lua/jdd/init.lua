@@ -1,5 +1,4 @@
 local M = {}
-local Job = require("plenary.job")
 local log = require("plenary.log").new({
   plugin = "jdd",
   level = "info",
@@ -22,17 +21,13 @@ M.config = {
   start = true,
 }
 
-local jdd_job = nil
+local jdd_handle = nil
 
 --- Sets up the jdd.nvim plugin.
 -- Call this before using other functions.
 -- @param opts table|nil Table of options (see M.config fields)
 function M.setup(opts)
   M.config = vim.tbl_deep_extend("force", M.config, opts or {})
-
-  log.debug("config is:")
-  log.debug(M.config)
-
   if M.config.start then M.start() end
 end
 
@@ -40,7 +35,14 @@ end
 -- Passes all configured options as CLI arguments.
 function M.start()
   -- If already running, stop first
-  if jdd_job then M.stop() end
+  if jdd_handle then
+    log.info("stopping running jdd before starting a new one")
+
+    M.stop()
+
+    -- Wait for previous job to exit before starting a new one
+    vim.wait(1000, function() return jdd_handle == nil end, 10, false)
+  end
 
   local args = {}
 
@@ -69,31 +71,28 @@ function M.start()
     end
   end
 
-  jdd_job = Job:new({
-    command = "jdd",
-    args = args,
-    on_stdout = function(_, data)
-      vim.schedule(function() log.info(data) end)
+  jdd_handle = vim.system(vim.list_extend({ "jdd" }, args), {
+    stdout = function(_, data)
+      if data then log.info(data) end
     end,
-    on_stderr = function(_, data)
-      vim.schedule(function() log.error(data) end)
+    stderr = function(_, data)
+      if data then log.error(data) end
     end,
-    on_exit = function(_, code)
-      vim.schedule(function() log.info("jdd exited with code " .. tostring(code)) end)
-    end,
-  })
+    detach = false,
+  }, function(obj)
+    log.info("jdd exited with code " .. tostring(obj.code))
+    jdd_handle = nil
+    log.info("jdd handle reference cleared after exit")
+  end)
 
-  jdd_job:start()
-
-  log.info("jdd job started")
+  log.info("jdd job started (pid: " .. tostring(jdd_handle.pid) .. ")")
 end
 
 --- Stops the running Johnny Decimal Daemon process, if any.
 function M.stop()
-  if jdd_job then
-    jdd_job:shutdown()
-    jdd_job = nil
-    log.info("jdd job stopped")
+  if jdd_handle and jdd_handle.pid then
+    log.info("requesting shutdown of jdd (pid: " .. tostring(jdd_handle.pid) .. ")")
+    vim.loop.kill(jdd_handle.pid, 15) -- 15 = SIGTERM
   else
     log.info("no jdd job to stop")
   end
@@ -119,7 +118,7 @@ vim.api.nvim_create_user_command(
 
 vim.api.nvim_create_user_command(
   "JddStatus",
-  function() vim.notify("jdd running: " .. tostring(jdd_job ~= nil)) end,
+  function() vim.notify("jdd running: " .. tostring(jdd_handle ~= nil and jdd_handle.pid ~= nil)) end,
   { desc = "Indicates if the Johnny Decimal Daemon (jdd) is currently running." }
 )
 
