@@ -75,7 +75,7 @@ function M.start()
       vim.schedule(function() log.error(data) end)
     end,
     on_exit = function(_, code)
-      vim.schedule(function() log.info("jdd exited with code " .. code) end)
+      vim.schedule(function() log.info("jdd exited with code " .. tostring(code)) end)
     end,
   })
 
