@@ -84,6 +84,8 @@ function M.start()
   })
 
   jdd_job:start()
+
+  log.info("jdd job started")
 end
 
 --- Stops the running Johnny Decimal Daemon process, if any.
@@ -91,6 +93,9 @@ function M.stop()
   if jdd_job then
     jdd_job:shutdown()
     jdd_job = nil
+    log.info("jdd job stopped")
+  else
+    log.info("no jdd job to stop")
   end
 end
 
