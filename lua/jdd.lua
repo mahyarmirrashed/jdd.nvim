@@ -98,10 +98,10 @@ vim.api.nvim_create_autocmd("VimLeavePre", {
 --- Create auto commands for starting and stopping the Johnny Decimal Daemon.
 vim.api.nvim_create_user_command("JddStart", function()
   if not jdd_job then M.start() end
-end, {})
+end, { desc = "Start the Johnny Decimal Daemon (jdd) if it is not already running." })
 
 vim.api.nvim_create_user_command("JddStop", function()
   if jdd_job then M.stop() end
-end, {})
+end, { desc = "Stop the Johnny Decimal Daemon (jdd) if it is currently running." })
 
 return M
