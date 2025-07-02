@@ -29,6 +29,10 @@ local jdd_job = nil
 -- @param opts table|nil Table of options (see M.config fields)
 function M.setup(opts)
   M.config = vim.tbl_deep_extend("force", M.config, opts or {})
+
+  log.debug("config is:")
+  log.debug(M.config)
+
   if M.config.start then M.start() end
 end
 
