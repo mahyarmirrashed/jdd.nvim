@@ -63,14 +63,14 @@ require("jdd").setup({
   dry_run = false,
   -- exclude = { ".git/**", "tmp/**" },
   -- config = "/path/to/.jd.yaml", -- optional
-  start = true,
+  autostart = true,
 })
 ```
 
 To manually control the process:
 
 ```lua
-require("jdd").setup({ start = false })
+require("jdd").setup({ autostart = false })
 require("jdd").start() -- Start JDD
 require("jdd").stop()  -- Stop JDD
 ```

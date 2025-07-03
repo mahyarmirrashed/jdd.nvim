@@ -11,14 +11,14 @@ local log = require("plenary.log").new({
 -- @field dry_run? boolean If true, don't move files
 -- @field exclude? table|string Glob patterns to exclude
 -- @field config? string Path to config file
--- @field start? boolean Whether to auto-start JDD on setup (default: true)
+-- @field autostart? boolean Whether to auto-start JDD on setup (default: true)
 M.config = {
   root = nil,
   log_level = nil,
   dry_run = false,
   exclude = nil,
   config = nil,
-  start = true,
+  autostart = true,
 }
 
 local jdd_handle = nil
@@ -28,7 +28,7 @@ local jdd_handle = nil
 -- @param opts table|nil Table of options (see M.config fields)
 function M.setup(opts)
   M.config = vim.tbl_deep_extend("force", M.config, opts or {})
-  if M.config.start then M.start() end
+  if M.config.autostart then M.start() end
 end
 
 --- Starts the Johnny Decimal Daemon process in the foreground.
