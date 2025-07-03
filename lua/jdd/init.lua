@@ -11,6 +11,7 @@ local log = require("plenary.log").new({
 -- @field dry_run? boolean If true, don't move files
 -- @field exclude? table|string Glob patterns to exclude
 -- @field config? string Path to config file
+-- @field notify? boolean Whether to send vim notifications
 -- @field autostart? boolean Whether to auto-start JDD on setup (default: true)
 M.config = {
   root = nil,
@@ -18,10 +19,27 @@ M.config = {
   dry_run = false,
   exclude = nil,
   config = nil,
+  notify = false,
   autostart = true,
 }
 
 local jdd_handle = nil
+
+local function notify(msg, level)
+  if M.config.notify then
+    vim.schedule(function() vim.notify(msg, level or vim.log.levels.INFO, { title = "jdd.nvim" }) end)
+  end
+
+  if level == vim.log.levels.ERROR then
+    log.error(msg)
+  elseif level == vim.log.levels.WARN then
+    log.warn(msg)
+  elseif level == vim.log.levels.DEBUG then
+    log.debug(msg)
+  else
+    log.info(msg)
+  end
+end
 
 --- Sets up the jdd.nvim plugin.
 -- Call this before using other functions.
@@ -73,10 +91,10 @@ function M.start()
 
   jdd_handle = vim.system(vim.list_extend({ "jdd" }, args), {
     stdout = function(_, data)
-      if data then log.info(data) end
+      if data then notify(data) end
     end,
     stderr = function(_, data)
-      if data then log.error(data) end
+      if data then notify(data) end
     end,
     detach = false,
   }, function(obj)

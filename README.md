@@ -63,6 +63,7 @@ require("jdd").setup({
   dry_run = false,
   -- exclude = { ".git/**", "tmp/**" },
   -- config = "/path/to/.jd.yaml", -- optional
+  -- notify = false,
   autostart = true,
 })
 ```
